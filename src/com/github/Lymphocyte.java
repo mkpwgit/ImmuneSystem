@@ -14,6 +14,8 @@ public class Lymphocyte
 {
 
   private int id;
+  private int counterLife = 40;
+  private boolean isNeedToRemove = false;
 
   public Lymphocyte( int size, boolean random )
   {
@@ -51,7 +53,7 @@ public class Lymphocyte
         lymphocyte.array[i] = ( lymphocyte.array[i] + 1 ) % 2;
         numberOfChanges--;
       }
-      if ( i >= getSize()-1 ) {
+      if ( i >= getSize() - 1 ) {
         i = 0;
       } else {
         i++;
@@ -86,6 +88,31 @@ public class Lymphocyte
     }
 
     return affinity;
+  }
+
+  public void decreaseCountLife()
+  {
+    counterLife--;
+  }
+
+  public void increaseCountLife()
+  {
+    counterLife += 20;
+  }
+
+  public int getCounterLife()
+  {
+    return counterLife;
+  }
+
+  public boolean isNeedToRemove()
+  {
+    return isNeedToRemove;
+  }
+
+  public void setNeedToRemove( boolean isNeedToRemove )
+  {
+    this.isNeedToRemove = isNeedToRemove;
   }
 
   @Override

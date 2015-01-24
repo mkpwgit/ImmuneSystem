@@ -6,13 +6,13 @@ package com.github;
  * @author mikalai.kisel@ihg.com
  * @since 23 Jan, 2015
  */
-public class Antigen
+public class Virus
   extends Cell
 {
 
   private int id;
 
-  public Antigen( int size )
+  public Virus(int size)
   {
     super( size );
     this.id = counter;

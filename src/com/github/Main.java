@@ -7,18 +7,17 @@ public class Main
   {
     ImmuneSystem immuneSystem = new ImmuneSystem();
     immuneSystem.createSystem();
-    immuneSystem.print();
     immuneSystem.learning();
+    System.out.println( "Current lymphocytes:  " );
     immuneSystem.print();
-    immuneSystem.processCell( new Antigen( Cell.DEFAULT_SIZE ) );
+    immuneSystem.processCell( new Virus( Cell.DEFAULT_SIZE ) );
 
-    for (int i=0; i<100; i++) {
-      immuneSystem.processCell( new Antigen( Cell.DEFAULT_SIZE ) );
+    for( int i = 0; i < 2000; i++ ) {
+      immuneSystem.processCell( new Virus( Cell.DEFAULT_SIZE ) );
       immuneSystem.processCell( new Lymphocyte( Cell.DEFAULT_SIZE ) );
     }
 
-    System.out.println("Finish!");
-
+    System.out.println( "Finish!" );
 
 
   }

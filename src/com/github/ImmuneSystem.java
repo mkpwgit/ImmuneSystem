@@ -19,7 +19,7 @@ public class ImmuneSystem
   public static int cellSize = Cell.DEFAULT_SIZE;
 
   private List<Lymphocyte> lymphocytes = new ArrayList<Lymphocyte>();
-  private List<Antigen> antigens = new ArrayList<Antigen>();
+  private List<Virus> viruses = new ArrayList<Virus>();
 
   public void createSystem()
   {
@@ -31,13 +31,13 @@ public class ImmuneSystem
   public void learning()
   {
     for( int i = 0; i < trainingSize; i++ ) {
-      antigens.add( new Antigen( cellSize ) );
+      viruses.add( new Virus( cellSize ) );
     }
     Map<Lymphocyte, Integer> tempLymphsMap = new HashMap<Lymphocyte, Integer>();
 
     for( Lymphocyte lymphocyte : lymphocytes ) {
-      for( Antigen antigen : antigens ) {
-        Integer currAffinity = lymphocyte.countAffinity( antigen );
+      for( Virus virus : viruses ) {
+        Integer currAffinity = lymphocyte.countAffinity( virus );
         Integer totalAffinity = tempLymphsMap.get( lymphocyte );
         if ( totalAffinity == null ) {
           tempLymphsMap.put( lymphocyte, currAffinity );
@@ -65,8 +65,10 @@ public class ImmuneSystem
 
   public void processCell( Cell cell )
   {
+    System.out.println( "Processing            : " + cell );
     List<CellAffinity> cellAffinities = new ArrayList<CellAffinity>();
     for( Lymphocyte lymphocyte : lymphocytes ) {
+      lymphocyte.decreaseCountLife();
       cellAffinities.add( new CellAffinity(
         lymphocyte, lymphocyte.countAffinity( cell ) ) );
     }
@@ -76,26 +78,51 @@ public class ImmuneSystem
     Lymphocyte champion = cellAffinities.get( 0 ).getLymphocyte();
     Integer championAffinity = cellAffinities.get( 0 ).getAffintiy();
 
-    if ( championAffinity < champion.getSize() * 0.67) {
-      System.out.println( "It is a good cell: " + cell +" ******************* ");
+    if ( championAffinity < champion.getSize() * 0.67 ) {
+      System.out.println( "It is a native cell. ******************* " );
     } else {
-      System.out.println( "Virus:      " + cell );
-      System.out.println( "Lymphocyte: " + champion );
+      champion.increaseCountLife();
+      System.out.println( "It is a virus." );
+      System.out.println( "Appropriate Lymphocyte: " + champion );
       System.out.println( "Affinity:   " + championAffinity );
-      antigens.add((Antigen) cell);
+      if ( cell instanceof Virus ) {
+        viruses.add( (Virus)cell );
+      }
 
       List<Lymphocyte> clones = champion.getClones( 12 );
       CellAffinity cloneChampion = findChampion( clones, cell );
-      System.out.println( "Best clone: " + cloneChampion.getLymphocyte() );
-      System.out.println( "Clone affinity: " + cloneChampion.getAffintiy() );
+      System.out.println( "Best clone            : " + cloneChampion.getLymphocyte() );
+      System.out.println( "Best Clone affinity   : " + cloneChampion.getAffintiy() );
+
+      CellAffinity secondCloneChampion = findSecondChampion( clones, cell );
+
+      System.out.println( "Second clone          : " + secondCloneChampion.getLymphocyte() );
+      System.out.println( "Second clone affinity : "
+        + secondCloneChampion.getAffintiy() );
 
       if ( cloneChampion.getAffintiy() > championAffinity ) {
         lymphocytes.add( cloneChampion.getLymphocyte() );
       }
 
+      if ( secondCloneChampion.getAffintiy() > championAffinity ) {
+        lymphocytes.add( secondCloneChampion.getLymphocyte() );
+      }
+
     }
+
+    checkLifeCounter();
   }
 
+  public void checkLifeCounter()
+  {
+    for( Iterator<Lymphocyte> iter = lymphocytes.listIterator(); iter.hasNext(); ) {
+      Lymphocyte lymphocyte = iter.next();
+      if ( lymphocyte.getCounterLife() <= 0 ) {
+        iter.remove();
+      }
+    }
+    System.out.println();
+  }
 
   private CellAffinity findChampion( List<Lymphocyte> tempLymphocytes, Cell cell )
   {
@@ -108,6 +135,20 @@ public class ImmuneSystem
     Collections.sort( cellAffinities );
 
     return cellAffinities.get( 0 );
+  }
+
+  private CellAffinity findSecondChampion( List<Lymphocyte> tempLymphocytes,
+    Cell cell )
+  {
+    List<CellAffinity> cellAffinities = new ArrayList<CellAffinity>();
+    for( Lymphocyte lymphocyte : tempLymphocytes ) {
+      cellAffinities.add( new CellAffinity(
+        lymphocyte, lymphocyte.countAffinity( cell ) ) );
+    }
+
+    Collections.sort( cellAffinities );
+
+    return cellAffinities.get( 1 );
   }
 
   public void print()
